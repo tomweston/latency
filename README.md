@@ -1,6 +1,6 @@
-# LΛTENCY
+# LΛTENCY ![Build](https://github.com/tomweston/latency/actions/workflows/go.yml/badge.svg)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/tomweston/latency/blob/master/LICENCE)
 
-A tool to measure the latency of messages published on the Ably Realtime Network. It utilises a structure of commands, arguments & flags. It supports Fully POSIX-compliant flags (including short & long versions)
+A Golang CLI tool used to measure the latency of messages published on the Ably Realtime Network. It utilises a structure of commands, arguments & flags. It supports Fully POSIX-compliant flags (including short & long versions)
 
 ## Requirements
 
