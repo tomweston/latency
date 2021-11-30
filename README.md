@@ -1,8 +1,6 @@
 # LΛTENCY
 
-## Overview
-
-Latency is a tool to measure the latency of messages published on the Ably Realtime Network. It utilises a structure of commands, arguments & flags. It supports Fully POSIX-compliant flags (including short & long versions)
+A tool to measure the latency of messages published on the Ably Realtime Network. It utilises a structure of commands, arguments & flags. It supports Fully POSIX-compliant flags (including short & long versions)
 
 ## Requirements
 
