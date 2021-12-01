@@ -37,11 +37,8 @@ const (
 	timeout = 30
 )
 
-var (
-	AblyChannel string
-	AblyKey     string
-	AblyEvent   string
-)
+var subAblyEvent string
+var subAblyChannel string
 
 // subscribeCmd represents the subscribe command
 var subscribeCmd = &cobra.Command{
@@ -54,8 +51,8 @@ var subscribeCmd = &cobra.Command{
 		ng := names.NewNameGenerator(seed)
 		id := ng.Generate()
 
-		AblyChannel := cmd.Flag("channel").Value.String()
-		AblyEvent := cmd.Flag("event").Value.String()
+		subAblyChannel := cmd.Flag("channel").Value.String()
+		subsubAblyEvent := cmd.Flag("event").Value.String()
 
 		AblyKey := utils.GetEnv("ABLY_KEY", "")
 
@@ -68,15 +65,15 @@ var subscribeCmd = &cobra.Command{
 		}
 
 		log.WithFields(log.Fields{
-			"channel": AblyChannel,
+			"channel": subAblyChannel,
 			"client":  id,
-			"event":   AblyEvent,
+			"event":   subsubAblyEvent,
 			"timeout": fmt.Sprint(timeout) + " Seconds",
 		}).Info("Listening for Messages...")
 
 		DurationOfTime := time.Duration(1) * time.Second
 		f := func() {
-			checkSubscribeToEvent(client, AblyChannel, AblyEvent)
+			checkSubscribeToEvent(client, subAblyChannel, subAblyEvent)
 		}
 		Timer1 := time.AfterFunc(DurationOfTime, f)
 		defer Timer1.Stop()
@@ -84,7 +81,7 @@ var subscribeCmd = &cobra.Command{
 
 		// TODO: Handle unsubsribe
 		// TODO: Handle no messages received
-		GenerateLatencyReport(AblyChannel, id)
+		GenerateLatencyReport(subAblyChannel, id)
 
 	},
 }
@@ -96,22 +93,22 @@ func init() {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.InfoLevel)
 
-	subscribeCmd.Flags().StringVarP(&AblyChannel, "channel", "c", "", "The channel to subscribe to")
-	subscribeCmd.Flags().StringVarP(&AblyEvent, "event", "e", "", "The channel event to subscribe to")
+	subscribeCmd.Flags().StringVarP(&subAblyChannel, "channel", "c", "", "The channel to subscribe to")
+	subscribeCmd.Flags().StringVarP(&subAblyEvent, "event", "e", "", "The channel event to subscribe to")
 }
 
 // CheckSubscribeToEvent checks if the channel is subscribed to the event
-func checkSubscribeToEvent(client *ably.Realtime, AblyChannel, AblyEvent string) func() {
-	c := client.Channels.Get(AblyChannel)
-	unsubscribe := SubscribeToEvent(c, AblyEvent)
+func checkSubscribeToEvent(client *ably.Realtime, subAblyChannel, subAblyEvent string) func() {
+	c := client.Channels.Get(subAblyChannel)
+	unsubscribe := SubscribeToEvent(c, subAblyEvent)
 	return unsubscribe
 }
 
 // SubscribeToEvent subscribes to the event
-func SubscribeToEvent(channel *ably.RealtimeChannel, AblyEvent string) func() {
+func SubscribeToEvent(channel *ably.RealtimeChannel, subAblyEvent string) func() {
 
 	// Subscribe to messages sent on the channel with given eventName
-	unsubscribe, err := channel.Subscribe(context.Background(), AblyEvent, func(msg *ably.Message) {
+	unsubscribe, err := channel.Subscribe(context.Background(), subAblyEvent, func(msg *ably.Message) {
 
 		// Save message to parts separate by ":"
 		msgParts := strings.Split(fmt.Sprint(msg.Data), ":")
@@ -180,7 +177,7 @@ type Report struct {
 }
 
 // GenerateLatencyReport generates a report of the messages recieved
-func GenerateLatencyReport(AblyChannel, id string) {
+func GenerateLatencyReport(subAblyChannel, id string) {
 
 	// Let's first read the `0.json` file
 	r0, err := ioutil.ReadFile("0.json")
@@ -222,7 +219,7 @@ func GenerateLatencyReport(AblyChannel, id string) {
 	}
 
 	log.WithFields(log.Fields{
-		"channel": AblyChannel,
+		"channel": subAblyChannel,
 		"client":  id,
 	}).Info("Generating Latency Report...")
 

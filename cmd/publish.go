@@ -28,12 +28,15 @@ import (
 	utils "github.com/tomweston/latency/pkg/utils"
 )
 
-// const (
-// 	numMessages = 3
-// 	delay       = 5
-// )
+const (
+	num      = 3
+	pubDelay = 5
+)
 
-// speakCmd represents the speak command
+var pubAblyChannel string
+var pubAblyEvent string
+
+// publishCmd represents the publish command
 var publishCmd = &cobra.Command{
 	Use:   "publish",
 	Short: "Publish a message to a channel",
@@ -44,10 +47,10 @@ var publishCmd = &cobra.Command{
 		ng := names.NewNameGenerator(seed)
 		id := ng.Generate()
 
-		AblyChannel := cmd.Flag("channel").Value.String()
-		AblyEvent := cmd.Flag("event").Value.String()
-		numMessages := cmd.Flag("number").Value.String()
-		delay := cmd.Flag("delay").Value.String()
+		pubAblyChannel := cmd.Flag("channel").Value.String()
+		pubAblyEvent := cmd.Flag("event").Value.String()
+		// numMessages := cmd.Flag("number").Value.String()
+		// pubDelay := cmd.Flag("delay").Value.String()
 		AblyKey := utils.GetEnv("ABLY_KEY", "")
 
 		// Create a new Ably client
@@ -59,11 +62,15 @@ var publishCmd = &cobra.Command{
 		}
 
 		// Setup a channel to publish to
-		channel := client.Channels.Get(AblyChannel)
+		channel := client.Channels.Get(pubAblyChannel)
 
-		// Build message to publish
+		// Convert the number of messages to an integer
+		// n, err := strconv.Atoi(numMessages)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// }
 
-		messages := [numMessages]string{}
+		messages := [3]string{}
 		for m := range messages {
 
 			// Assign a timestamp to the message
@@ -74,18 +81,19 @@ var publishCmd = &cobra.Command{
 			CompositMessage := fmt.Sprint(m) + ":" + fmt.Sprint(tUnixMicro)
 
 			// Publish the message
-			Publish(channel, AblyEvent, CompositMessage)
+			Publish(channel, pubAblyEvent, CompositMessage)
 
 			// Sleep for prescribed delay
-			delay, err := time.ParseDuration(delay)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"error": err,
-				}).Error("Error parsing delay")
 
-			}
+			// delayTime, err := time.ParseDuration(pubDelay)
+			// if err != nil {
+			// 	log.WithFields(log.Fields{
+			// 		"error": err,
+			// 	}).Error("Error parsing delay")
 
-			time.Sleep(delay * time.Second)
+			// }
+
+			time.Sleep(pubDelay * time.Second)
 		}
 
 	},
@@ -97,10 +105,10 @@ func init() {
 	// log.SetFormatter(&log.JSONFormatter{})
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.InfoLevel)
-	publishCmd.Flags().StringVarP(&AblyChannel, "channel", "c", "", "The channel to subscribe to")
-	publishCmd.Flags().StringVarP(&AblyEvent, "event", "e", "", "The channel event to subscribe to")
-	publishCmd.Flags().IntVarP(&numMessages, "number", "n", "", "The channel event to subscribe to")
-	publishCmd.Flags().IntVarP(&delay, "delay", "d", "", "The channel event to subscribe to")
+	publishCmd.Flags().StringVarP(&pubAblyChannel, "channel", "c", "", "The channel to subscribe to")
+	publishCmd.Flags().StringVarP(&pubAblyEvent, "event", "e", "", "The channel event to subscribe to")
+	// publishCmd.Flags().StringVarP(&numMessages, "number", "n", "", "The channel event to subscribe to")
+	// publishCmd.Flags().StringVarP(&pubDelay, "delay", "d", "", "The delay between messages")
 
 }
 

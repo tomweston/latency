@@ -24,7 +24,13 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var (
+	cfgFile     string
+	numMessages string
+	delay       string
+	AblyChannel string
+	AblyEvent   string
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
