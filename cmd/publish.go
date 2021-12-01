@@ -28,10 +28,10 @@ import (
 	utils "github.com/tomweston/latency/pkg/utils"
 )
 
-const (
-	msgCount = 3
-	delay    = 5
-)
+// const (
+// 	numMessages = 3
+// 	delay       = 5
+// )
 
 // speakCmd represents the speak command
 var publishCmd = &cobra.Command{
@@ -46,7 +46,8 @@ var publishCmd = &cobra.Command{
 
 		AblyChannel := cmd.Flag("channel").Value.String()
 		AblyEvent := cmd.Flag("event").Value.String()
-
+		numMessages := cmd.Flag("number").Value.String()
+		delay := cmd.Flag("delay").Value.String()
 		AblyKey := utils.GetEnv("ABLY_KEY", "")
 
 		// Create a new Ably client
@@ -61,7 +62,8 @@ var publishCmd = &cobra.Command{
 		channel := client.Channels.Get(AblyChannel)
 
 		// Build message to publish
-		messages := [msgCount]string{}
+
+		messages := [numMessages]string{}
 		for m := range messages {
 
 			// Assign a timestamp to the message
@@ -75,6 +77,14 @@ var publishCmd = &cobra.Command{
 			Publish(channel, AblyEvent, CompositMessage)
 
 			// Sleep for prescribed delay
+			delay, err := time.ParseDuration(delay)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error": err,
+				}).Error("Error parsing delay")
+
+			}
+
 			time.Sleep(delay * time.Second)
 		}
 
@@ -89,6 +99,8 @@ func init() {
 	log.SetLevel(log.InfoLevel)
 	publishCmd.Flags().StringVarP(&AblyChannel, "channel", "c", "", "The channel to subscribe to")
 	publishCmd.Flags().StringVarP(&AblyEvent, "event", "e", "", "The channel event to subscribe to")
+	publishCmd.Flags().IntVarP(&numMessages, "number", "n", "", "The channel event to subscribe to")
+	publishCmd.Flags().IntVarP(&delay, "delay", "d", "", "The channel event to subscribe to")
 
 }
 
