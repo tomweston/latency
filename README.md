@@ -27,16 +27,20 @@ Latency requires the following environment variables to be set:
 ### Basic Usage 
 
 
-#### Build:
 ```
-$ git clone https://github.com/tomweston/latency
-$ cd latency
-$ docker build -t latency .
+go build
 ```
 
-### Run:
+**Instance 1:**
+
 ```
-$ docker run -it latency
+./latency subscribe --channel MAIN --event TEST
+```
+
+**Instance 2:**
+
+```
+./latency publish --channel MAIN --event TEST
 ```
 
 [**publish**]: https://github.com/tomweston/latency#commands
